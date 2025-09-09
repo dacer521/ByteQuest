@@ -1,11 +1,11 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev',  # change in production
+        SECRET_KEY='dev', 
         DATABASE=os.path.join(app.instance_path, 'app.sqlite'),
     )
 
@@ -22,13 +22,13 @@ def create_app(test_config=None):
     # Root route
     @app.route('/')
     def index():
-        return "Welcome to your Flask app template!"
+        return render_template("index.html")
 
     # Example route
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
-
+    
 
     return app
 
