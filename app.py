@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 
 def create_app(test_config=None):
     # Create and configure the app
@@ -19,19 +19,26 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # Context processor for template variables
+    @app.context_processor
+    def inject_brand():
+        return {
+            "SITE_NAME": "ByteQuest",
+            "LOGO_URL": url_for("static", filename="images/logo.png")
+        }
+
     # Root route
     @app.route('/')
     def index():
         return render_template("index.html")
 
     # Example route
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-    
+    # @app.route('/hello')
+    # def hello():
+    #     return 'Hello, World!'
 
     return app
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5005, debug=True)
