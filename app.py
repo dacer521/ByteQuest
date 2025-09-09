@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, render_template
 
 def create_app(test_config=None):
     # Create and configure the app
@@ -22,13 +22,13 @@ def create_app(test_config=None):
     # Root route
     @app.route('/')
     def index():
-        return "Welcome to your Flask app template!"
+        return render_template("index.html")
 
     # Example route
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
-
+    
 
     return app
 
