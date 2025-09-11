@@ -3,7 +3,7 @@ from flask import Flask, render_template
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_wtf import *;
+# from flask_wtf import *; #this is giving errors right now. commenting it out until i figure that out,
 
 #we might not need this one
 from werkzeug.security import generate_password_hash, check_password_hash
