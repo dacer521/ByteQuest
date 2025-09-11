@@ -3,6 +3,7 @@ from flask import Flask, render_template
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_wtf import *;
 
 #we might not need this one
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -27,13 +28,18 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+
+    """These should only be essential routes. We will deal with articles' routes using code to do it automatically"""
+
     # Root route
     @app.route('/')
     def index():
         return render_template("index.html")
 
     # Example route
-    @app.route('/hello')
+    @app.route('/home')
+    #login_required makes it so they need to be logged in, in this case have a linked email. we wil use this for p much everywhere except login.
+    @login_required
     def hello():
         return 'Hello, World!'
     
