@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from flask import Flask, render_template
 
 from flask_sqlalchemy import SQLAlchemy
@@ -8,11 +9,49 @@ from flask_wtf import *; #this is giving errors right now. commenting it out unt
 #we might not need this one
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from oauthlib.oauth2 import WebApplicationClient
+import requests
+
+# Internal imports
+from db import init_db_command
+from user import User
+
+# Configuration
+"""Important to note we are not storing client_secret here. ID is technically fine but, still,
+for these, you can open CMD prompt and do:
+set GOOGLE_CLIENT_(secret or id)=whatever_the_keys_are
+"""
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None) 
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_DISCOVERY_URL = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
+
+# User session management setup
+# https://flask-login.readthedocs.io/en/latest
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# Naive database setup
+try:
+    init_db_command()
+except sqlite3.OperationalError:
+    # Assume it's already been created
+    pass
+
+# OAuth 2 client setup (for the google logon)
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+# Flask-Login helper to retrieve a user from the db
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev', 
+        SECRET_KEY=os.environ.get("SECRET_KEY") or os.urandom(24), #makes sure it's always encrypted even if secret key isn't set as an environmental variable 
         DATABASE=os.path.join(app.instance_path, 'app.sqlite'),
         SQLALCHEMY_DATABASE_URI = "sqlite:///db.sqlite",
         SQLALCHEMY_TRACK_MODIFICATIONS = False,
