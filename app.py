@@ -13,15 +13,15 @@ from db import init_db_command
 from user import User
 
 # Configuration
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None) 
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", None) 
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY=os.environ.get("SECRET_KEY") or os.urandom(24),
+        SECRET_KEY=os.getenv("SECRET_KEY") or os.urandom(24),
         DATABASE=os.path.join(app.instance_path, 'app.sqlite'),
         SQLALCHEMY_DATABASE_URI="sqlite:///db.sqlite",
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
