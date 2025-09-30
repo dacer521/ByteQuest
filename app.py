@@ -48,7 +48,7 @@ def create_app(test_config=None):
     def load_user(user_id):
         return User.get(user_id)
 
-    # Ensure the database is initialized manually via 
+    # Ensure the database is initialized manually via CLI
     # Make sure that you are in the venv and run `flask init-db`
     app.cli.add_command(init_db_command)
 
