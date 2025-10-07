@@ -44,7 +44,7 @@ def create_app(test_config=None):
 
     client = WebApplicationClient(GOOGLE_CLIENT_ID)
     
-    login_manager.login_view = "index"
+    login_manager.login_view = "index" #this makes it so when they try to access a page that needs a login, they are redirected to main page.
 
     @login_manager.user_loader
     def load_user(user_id):
