@@ -43,6 +43,8 @@ def create_app(test_config=None):
     login_manager.init_app(app)
 
     client = WebApplicationClient(GOOGLE_CLIENT_ID)
+    
+    login_manager.login_view = "index"
 
     @login_manager.user_loader
     def load_user(user_id):
