@@ -1,0 +1,9 @@
+{
+  "unit1": {
+    "title": "Introduction to Variables and Basic Operations",
+    "description": "Complete the following tasks:\n\nPart A: Create a variable that stores the sum of 15 and 27.\n\nPart B: Create a variable that stores the result of 100 divided by 4.\n\nPart C: Create a variable that stores my favorite number (hint: its 42) multiplied by 2.\n\nYour submit_answers() function should return a list with three values: [part_a, part_b, part_c]",
+    "answers": [42, 25.0, 84],
+    "points": 100,
+    "num_parts": 3
+  }
+}

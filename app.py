@@ -7,6 +7,8 @@ from flask_wtf import *;
 from werkzeug.security import generate_password_hash, check_password_hash
 from oauthlib.oauth2 import WebApplicationClient
 import requests
+import RestrictedPython
+import codeEvaluator
 import json
 
 # Internal imports
@@ -71,18 +73,15 @@ def create_app(test_config=None):
     def index():
         if current_user.is_authenticated:
             return (
-                "<p>Hello, {}! You're logged in! Email: {}</p>"
-                "<div><p>Google Profile Picture:</p>"
-                '<img src="{}" alt="Google profile pic"></img></div>'
-                '<a class="button" href="/logout">Logout</a>'.format(
-                    current_user.name, current_user.email, current_user.profile_pic
-                )
+                f"<p>Hello, {current_user.name}! You're logged in! Email: {current_user.email}</p>"
+                f"<div><p>Google Profile Picture:</p>"
+                f'<img src="{current_user.profile_pic}" alt="Google profile pic"></img></div>'
+                f'<a class="button" href="/logout">Logout</a><br><br>'
+                f'<a href="/practice/unit1">Go to Unit 1 Practice</a>'
             )
         else:
             return '<a class="button" href="/login">Google Login</a>'
 
-            # return render_template("index.html") #TODO: UNCOMMENT AND TURN ABOVE INTO A TEMPLATE
-    
     @app.route("/login")
     def login():
         # Find out what URL to hit for Google login
@@ -156,10 +155,32 @@ def create_app(test_config=None):
     def logout():
         logout_user()
         return redirect(url_for("index"))
+    
+   # In your practice route:
+    @app.route("/practice/<unit_name>")
+    @login_required
+    def practice(unit_name):
+        # Load the unit data to pass to template
+        unit_data = codeEvaluator.get_unit_data(unit_name)
+        if not unit_data:
+            return "Unit not found", 404
+        return render_template("practice.html", unit_name=unit_name, unit_data=unit_data)
+
+
+    @app.route("/submit_code", methods=["POST"])
+    @login_required
+    def submit_code():
+        unit_name = request.form.get("unit_name")
+        code = request.form.get("code")
+        result = codeEvaluator.evaluate_submission(unit_name, code)
+        return render_template("result.html", unit_name=unit_name, code=code, result=result)
+
+    
+
     return app
+
 
 if __name__ == "__main__":
     app = create_app()
-    #USE THIS IF TESTING LOCALLY (until we get a website with a certificate.)
-    #ssl_context="adhoc"
-    app.run(host="0.0.0.0", port=5000, debug=True,ssl_context="adhoc")
+    #USE THIS IF TESTING LOCALLY (until we get a website with a certificate.) ssl_context="adhoc"
+    app.run(host="0.0.0.0", port=5000 ,ssl_context="adhoc")
