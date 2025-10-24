@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are variables?{% endblock %}
+
+{% block content %}
 <h1>What are variables?</h1>
 <p>Variables are an incredibly important concept in programming you may remember from math class. You essentially come up with an arbitrary name, like x, and give it a value. </p>
 <p>Let’s look at an example. </p>
@@ -18,3 +21,5 @@ Additionally, you cannot name your variables something called “reserved words�
 
 Variables are a very useful tool in programming, and their use will become more obvious as you program more. </p>
 
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

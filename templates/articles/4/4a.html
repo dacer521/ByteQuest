@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are loops? Why use them?{% endblock %}
+
+{% block content %}
 <h1>What are loops? Why use them?</h1>
 <p>Imagine you wanted to count the number of a certain letter of a string, but you didn’t know its length. This problem would be unsolvable simply using if statements, so to solve it: we need a new tool. That tool is called a loop. <br>
 
@@ -57,3 +60,5 @@ Here is strawberry shown in this way. <br>
 9 Y </p>
 
 <p>Overall, loops are a very useful tool we’re going to continue to look at this chapter. If you feel confused: that totally makes sense! This is a difficult concept at first. Try to play around with loops in IDLE, and make sure you understand the range function!!! </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

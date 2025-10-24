@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What is programming?{% endblock %}
+
+{% block content %}
 <h1>What is programming?</h1>
 
 <p>Programming is defined as “the process or activity of writing computer programs.” The reason we have to use this instead of just talking normally to a computer like we would to another person is how computers process information. 
@@ -38,3 +41,5 @@ If you don’t have python installed or don’t know what that means, that's oka
 Run that file and navigate through the menu. Then look up “idle” in the windows menu by clicking the windows button and “open” or on mac hit cmd + space and look up IDLE. <br><br>
 
 We will use this in later lessons to write and run python code! </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

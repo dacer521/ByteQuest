@@ -3,13 +3,14 @@ import os
 from RestrictedPython import compile_restricted, safe_globals
 
 
-
+#gets unit info
 def get_unit_data(unit_name):
     return ANSWER_KEYS.get(unit_name)
 
 with open('data/unit_answers.json', 'r') as f:
     ANSWER_KEYS = json.load(f)
 
+#main method
 def evaluate_submission(unit_name, code):
 
     unit_data = ANSWER_KEYS.get(unit_name)
@@ -37,7 +38,7 @@ def evaluate_submission(unit_name, code):
     restricted_globals['submit_answers'] = submit_answers 
     restricted_locals = {}
     
-
+    #runs code without security risk bc restricted python 
     try:
         exec(byte_code, restricted_globals, restricted_locals)
     except Exception as e:
@@ -51,7 +52,7 @@ def evaluate_submission(unit_name, code):
     if captured_answers == expected_answers:
         return {"success": True, "score": unit_data['points'], "message": "All correct!"}
     
-
+    #updates how they do
     else:
         return {
             "success": False, 

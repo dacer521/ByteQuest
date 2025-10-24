@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are conditionals?{% endblock %}
+
+{% block content %}
 <h1>What are conditionals?</h1>
 <p>Conditional statements are a powerful tool in programming. These are an overarching term, but the most common use of conditionals is “if statements” <br>
 
@@ -16,3 +19,5 @@ Conditionals can also help programs recognize important data, like if a number i
 Let’s look at an example.</p>
 <img src = "images/code27.png" alt = "python code">
 <p>Conditionals are not just if statements though, which is part of how they’re so useful! We will continue to use these throughout the course, but these basics are key to understand. </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

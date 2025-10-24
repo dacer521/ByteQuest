@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are operators?{% endblock %}
+
+{% block content %}
 <h1>What are operators?</h1>
 <p>A very important part of almost any program is math, which is why operators are very important. <br>
 
@@ -66,3 +69,5 @@ Take a guess before looking at the next answer: what would 11 % 4 be? <br>
 The answer is 3!! 8 / 4 = 0. 11 is 3 bigger than 8, so the remainder is 3. This can be a tricky concept, so feel free to practice it some more before moving on to fully understand. <br>
 
 Operators are a very useful tool that we will continue using for the entire course. </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

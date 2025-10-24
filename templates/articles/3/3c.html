@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}Match case statements{% endblock %}
+
+{% block content %}
 <p>Imagine you’re trying to make a basic console-based user interface. You have them select a number from 1-5 which corresponds to a given functionality. To make this work you’ll have to have an if statement with four custom elifs. That sounds like a lot of work, so, naturally, you’d use a match case statement!!!  </p>
 <p><br>Incredible segue, I know. A match case statement is essetially a list of conditions which will run based on a given input.</p>
 <img src = "images/code32.png" alt = "python code">
@@ -10,3 +13,5 @@
 <p >Answer: ‘no match made’ prints. Although x is greater than 10, it’s not even. And likewise, it is not even, which means neither case would be true: so, it would go to the default condition, which functions as the “else” block. </p>
 
 <p>Overall, match case is a very useful conditional that can save you effort in certain use cases.  However, keep in mind that both if statements and match case will achieve the same goal. If one makes more sense to you than the other: use it! </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

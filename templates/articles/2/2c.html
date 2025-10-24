@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are logical operators?{% endblock %}
+
+{% block content %}
 <h1>What are logical operators?</h1>
 <p>This lesson will go over logical and comparative operators. <br>
 
@@ -41,3 +44,5 @@ Greater than ‘>’ </p>
 <p>Although x and y have the same value, they are <strong>not</strong> the same object, which is why x is y is not true. The is operator is not used as much as the other logical operators but is useful to be aware of. </p>
 
 <p><br>Overall, logical operators are integral tools to understand. Make sure to review these if you feel confused, as they will be very neccessary in the next unit.</p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

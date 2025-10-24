@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are nested loops?{% endblock %}
+
+{% block content %}
 <h1>What are nested loops?</h1>
 <p>In the last lesson we went over all the basics you need for a loop: now, let’s learn how to use loops to their fullest potential, using nested loops. <br>
 
@@ -43,3 +46,5 @@ This continues with j printing one more each time until it prints 9 stars in the
     This example helps explain how nested for loops work: the inner loop happens to completion based on the outer loop.  <br>
     Please explore using these loops: they are very useful but can be quite confusing at times. Work this out and then move onto the final lesson chapter 4! You’re doing a great job. 
 </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}
