@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_wtf import *;
@@ -14,6 +14,85 @@ import json
 # Internal imports
 from db import init_db_command
 from user import User
+
+ARTICLE_STRUCTURE = [
+    {
+        "unit": 1,
+        "title": "Programming Basics",
+        "lessons": [
+            {"slug": "1a", "title": "What is programming?"},
+            {"slug": "1b", "title": "What are variables?"},
+        ],
+    },
+    {
+        "unit": 2,
+        "title": "Data Types and Operators",
+        "lessons": [
+            {"slug": "2a", "title": "What are data types?"},
+            {"slug": "2b", "title": "What are operators?"},
+            {"slug": "2c", "title": "What are logical operators?"},
+        ],
+    },
+    {
+        "unit": 3,
+        "title": "Conditionals",
+        "lessons": [
+            {"slug": "3a", "title": "What are conditionals?"},
+            {"slug": "3b", "title": "What are elif and else statements?"},
+            {"slug": "3c", "title": "Match case statements"},
+        ],
+    },
+    {
+        "unit": 4,
+        "title": "Loops",
+        "lessons": [
+            {"slug": "4a", "title": "What are loops? Why use them?"},
+            {"slug": "4b", "title": "What are nested loops?"},
+            {"slug": "4c", "title": "What are while loops?"},
+        ],
+    },
+    {
+        "unit": 6,
+        "title": "Functions",
+        "lessons": [
+            {"slug": "6a", "title": "What are functions"},
+            {"slug": "6b", "title": "Functions as function arguments"},
+        ],
+    },
+]
+
+
+def build_article_registry(structure):
+    lookup = {}
+    sequence = []
+    nav = []
+    for unit in structure:
+        unit_entry = {
+            "unit": unit["unit"],
+            "title": unit["title"],
+            "lessons": [],
+        }
+        for lesson in unit["lessons"]:
+            meta = {
+                "unit": unit["unit"],
+                "unit_title": unit["title"],
+                "slug": lesson["slug"],
+                "title": lesson["title"],
+                "template": lesson.get("template")
+                or f"articles/{unit['unit']}/{lesson['slug']}.html",
+            }
+            unit_entry["lessons"].append(meta)
+            sequence.append(meta)
+            lookup[(meta["unit"], meta["slug"])] = meta
+        nav.append(unit_entry)
+    for idx, meta in enumerate(sequence):
+        meta["index"] = idx
+    return lookup, sequence, nav
+
+
+ARTICLE_LOOKUP, ARTICLE_SEQUENCE, ARTICLE_NAV = build_article_registry(
+    ARTICLE_STRUCTURE
+)
 
 # Configuration
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", None) 
@@ -45,6 +124,12 @@ def create_app(test_config=None):
     login_manager.init_app(app)
 
     client = WebApplicationClient(GOOGLE_CLIENT_ID)
+
+    @app.context_processor
+    def inject_navigation():
+        return {
+            "ARTICLE_NAV": ARTICLE_NAV,
+        }
     
     login_manager.login_view = "index" #this makes it so when they try to access a page that needs a login, they are redirected to main page.
 
@@ -71,16 +156,9 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-        if current_user.is_authenticated:
-            return (
-                f"<p>Hello, {current_user.name}! You're logged in! Email: {current_user.email}</p>"
-                f"<div><p>Google Profile Picture:</p>"
-                f'<img src="{current_user.profile_pic}" alt="Google profile pic"></img></div>'
-                f'<a class="button" href="/logout">Logout</a><br><br>'
-                f'<a href="/practice/unit1">Go to Unit 1 Practice</a>'
-            )
-        else:
-            return '<a class="button" href="/login">Google Login</a>'
+        return render_template(
+            "index.html",
+        )
 
     @app.route("/login")
     def login():
@@ -174,6 +252,28 @@ def create_app(test_config=None):
         code = request.form.get("code")
         result = codeEvaluator.evaluate_submission(unit_name, code)
         return render_template("result.html", unit_name=unit_name, code=code, result=result)
+
+    @app.route("/articles/<int:unit>/<slug>")
+    def article(unit, slug):
+        article_meta = ARTICLE_LOOKUP.get((unit, slug))
+        if not article_meta:
+            abort(404)
+        prev_article = (
+            ARTICLE_SEQUENCE[article_meta["index"] - 1]
+            if article_meta["index"] > 0
+            else None
+        )
+        next_article = (
+            ARTICLE_SEQUENCE[article_meta["index"] + 1]
+            if article_meta["index"] < len(ARTICLE_SEQUENCE) - 1
+            else None
+        )
+        return render_template(
+            article_meta["template"],
+            current_article=article_meta,
+            prev_article=prev_article,
+            next_article=next_article,
+        )
 
     
 

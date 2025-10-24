@@ -1,5 +1,90 @@
 {% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
+{% block title %}Home{% endblock %}
 {% block content %}
-<h1>home page</h1>
+<div class="container py-5">
+    <div class="row g-4 align-items-start mb-5">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-semibold mb-3">Welcome to ByteQuest</h1>
+            <p class="lead mb-4">
+                Explore step-by-step lessons that build your Python fundamentals. Work through each article,
+                then practice what you learned with interactive coding challenges.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                {% if current_user.is_authenticated %}
+                <a class="btn btn-primary" href="{{ url_for('practice', unit_name='unit1') }}">
+                    Continue to practice
+                </a>
+                <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Sign out</a>
+                {% else %}
+                <a class="btn btn-primary" href="{{ url_for('login') }}">Sign in with Google</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {% if current_user.is_authenticated %}
+                    <div class="d-flex align-items-center mb-3">
+                        {% if current_user.profile_pic %}
+                        <img src="{{ current_user.profile_pic }}" alt="Profile picture"
+                             class="rounded-circle me-3" width="56" height="56">
+                        {% endif %}
+                        <div>
+                            <h2 class="h5 mb-1">Hi, {{ current_user.name }}!</h2>
+                            <p class="text-muted mb-0">{{ current_user.email }}</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">
+                        Choose an article below or jump into practice to reinforce what you have learned.
+                    </p>
+                    <a class="btn btn-primary w-100 mb-2" href="{{ url_for('practice', unit_name='unit1') }}">
+                        Open practice
+                    </a>
+                    <a class="btn btn-outline-secondary w-100" href="{{ url_for('logout') }}">Sign out</a>
+                    {% else %}
+                    <h2 class="h5 mb-3">Learning made simple</h2>
+                    <p class="text-muted mb-4">
+                        Sign in to track your progress and unlock guided practice sessions.
+                    </p>
+                    <a class="btn btn-primary w-100" href="{{ url_for('login') }}">Sign in with Google</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <h2 class="h4 mb-1">Start learning</h2>
+        <p class="text-muted mb-0">Browse the curriculum and open any article to begin.</p>
+    </div>
+
+    <div class="row g-4">
+        {% for unit in ARTICLE_NAV %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h3 class="h5 mb-3">
+                        Unit {{ unit.unit }}{% if unit.title %}: {{ unit.title }}{% endif %}
+                    </h3>
+                    <ul class="list-unstyled flex-grow-1 mb-3">
+                        {% for lesson in unit.lessons %}
+                        <li class="mb-2">
+                            <a class="link-primary text-decoration-none" href="{{ url_for('article', unit=lesson.unit, slug=lesson.slug) }}">
+                                {{ lesson.title }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% set first_lesson = unit.lessons|first %}
+                    {% if first_lesson %}
+                    <a class="btn btn-outline-primary btn-sm mt-auto align-self-start" href="{{ url_for('article', unit=first_lesson.unit, slug=first_lesson.slug) }}">
+                        Start unit
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

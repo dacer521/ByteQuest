@@ -24,24 +24,28 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Features</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
+                <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" aria-current="page" href="{{ url_for('index') }}">Home</a>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Dropdown link
+                <a class="nav-link dropdown-toggle {% if current_article %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Articles
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#">Action</a></li>
-                  <li><a class="dropdown-item" href="#">Another action</a></li>
-                  <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  {% for unit in ARTICLE_NAV %}
+                  <li>
+                    <h6 class="dropdown-header">Unit {{ unit.unit }}{% if unit.title %} – {{ unit.title }}{% endif %}</h6>
+                  </li>
+                  {% for lesson in unit.lessons %}
+                  <li>
+                    <a class="dropdown-item {% if current_article and current_article.unit == lesson.unit and current_article.slug == lesson.slug %}active{% endif %}" href="{{ url_for('article', unit=lesson.unit, slug=lesson.slug) }}">{{ lesson.title }}</a>
+                  </li>
+                  {% endfor %}
+                  {% if not loop.last %}
+                  <li><hr class="dropdown-divider"></li>
+                  {% endif %}
+                  {% endfor %}
                 </ul>
               </li>
             </ul>

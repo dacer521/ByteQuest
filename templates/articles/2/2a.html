@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are data types?{% endblock %}
+
+{% block content %}
 <h1>What are data types?</h1>
 
 <p>Data is defined as “the quantities, characters, or symbols on which operations are performed by a computer.” As you can see, there are many different kinds of data a computer could have to work with. To make this make sense to a computer we group data into different “data types”. </p>
@@ -22,3 +25,5 @@ Let’s look at an example using the “type” function.  We can put a variable
 Strings are the way text, letters and words are represented in code. They have to be surrounded by single or double quotes, ‘ or “. Let’s look at an example! </p>
 <img src = "images/code7.png" alt = "python code">
 <p>Different data types each serve their own purpose. Applications of them will be demonstrated as the course continues.</p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

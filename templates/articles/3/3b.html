@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}What are elif and else statements?{% endblock %}
+
+{% block content %}
 <h1>What are elif and else statements?</h1>
 <p>As useful as if statements are, we’ve so far only looked at a third of what they can do. If statements are most useful when using multiple conditions with elif and else.  <br>
 
@@ -16,3 +19,5 @@ This could include math as well! </p>
 <img src = "images/code31.png" alt = "python code">
 
 <p>Overall, if statements using elif and else are very useful. They can be used to control your program’s functionality. I would highly reccomend playing around with these on your own. You can make very cool programs even just using if statements! </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}
