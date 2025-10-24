@@ -6,3 +6,4 @@ src/__pycache__/
 .env
 env
 sqlite_db
+.DS_Store
