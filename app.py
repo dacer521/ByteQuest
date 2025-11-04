@@ -15,6 +15,8 @@ import json
 from db import init_db_command
 from user import User
 
+
+#defines structure
 ARTICLE_STRUCTURE = [
     {
         "unit": 1,
@@ -39,7 +41,7 @@ ARTICLE_STRUCTURE = [
         "lessons": [
             {"slug": "3a", "title": "What are conditionals?"},
             {"slug": "3b", "title": "What are elif and else statements?"},
-            {"slug": "3c", "title": "Match case statements"},
+            {"slug": "3c", "title": "What are match case statements?"},
         ],
     },
     {
@@ -55,13 +57,13 @@ ARTICLE_STRUCTURE = [
         "unit": 6,
         "title": "Functions",
         "lessons": [
-            {"slug": "6a", "title": "What are functions"},
-            {"slug": "6b", "title": "Functions as function arguments"},
+            {"slug": "6a", "title": "What are functions?"},
+            {"slug": "6b", "title": "What are functions as function arguments?"},
         ],
     },
 ]
 
-
+#sets up moving between articles so the in-between thingy works
 def build_article_registry(structure):
     lookup = {}
     sequence = []
