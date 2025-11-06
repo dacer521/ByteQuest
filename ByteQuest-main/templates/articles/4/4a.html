@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}What are loops? Why use them?{% endblock %}
+
+{% block content %}
+<h1>What are loops? Why use them?</h1>
+<p>Imagine you wanted to count the number of a certain letter of a string, but you didn’t know its length. This problem would be unsolvable simply using if statements, so to solve it: we need a new tool. That tool is called a loop. <br>
+
+Loops are used to do a given task over and over again; you can use if statements within loops to control them. Let’s look at a basic example of what a loop could be, but first: let’s learn about files in idle. <br>
+
+Up to now we’ve just been working in the IDLE shell, but now it’s time to start working on files which are far more convenient.  <br>
+
+To create a file hit “control n” on windows and “cmd n” on mac. This will open a new untitled window. Hit “control s” or “cmd s” and save it as ‘loops.py’ on your computer. You can save it anywhere you like, but we recommend making it in your downloads, documents or desktop so you remember where it is. <br>
+
+Now that we have our files set up, let’s look at an example of how a loop would work!</p>
+<img src = "images/code34.png" alt = "python code">
+
+<p>
+This loop used the range function to look at the numbers from 1-5. This function is <strong>inclusive</strong> of the first value, and <strong>not</strong> inclusive of the second. This means it starts at the first number you give it and stops at the second. You can also give range a third value, which would be how much the first value increases by instead of one. <br>
+
+If I had put in (1, 5, 2) instead of 1 2 3 4, it would have printed 1, 3.  <br>
+
+The loop functioned by printing out i over and over again saving time instead of having us manually type out all the addition and print statements. <br>
+
+Now that we’ve gone over a loop: let’s answer that question of counting the number of letters in a string!. <br>
+
+To do this, we will use something called ‘iteration’. Iteration is a term to describe looping through the values of a given object. We will iterate through every letter in the string, and check if each letter is our character: if it is, we add 1 to the variable, and if not, we don’!. <br>
+
+If you think you know how, try to program this on your own before looking at the example; but if you don’t that's okay! We haven’t gone over it yet. Give it a shot, and then come back.  <br>
+
+Let’s look for ‘r’ in Strawberry. </p>
+
+<img src = "images/code35.png" alt = "python code">
+
+<p>There are two valid ways to do this: looking at each value of Strawberry or using string indexing! <br>
+
+ 
+
+If you don’t know what string indexing is, don’t worry. We’ll go over it in more depth in the next chapter. But in short, you can access a value in a string by checking a number associated with it. This starts at zero, and the last value is the number of elements –1. <br>
+
+Here is strawberry shown in this way. <br>
+ 
+0 S  <br>
+
+1 T  <br>
+
+2 R  <br>
+
+3 A  <br>
+
+4 W  <br>
+
+5 B  <br>
+
+6 E  <br>
+
+7 R  <br>
+
+8 R  <br>
+
+9 Y </p>
+
+<p>Overall, loops are a very useful tool we’re going to continue to look at this chapter. If you feel confused: that totally makes sense! This is a difficult concept at first. Try to play around with loops in IDLE, and make sure you understand the range function!!! </p>
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

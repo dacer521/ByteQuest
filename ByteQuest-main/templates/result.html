@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Code Submission Result</title>
+</head>
+<body>
+    <h1>Results for {{ unit_name }}</h1>
+    
+    <h2>Your Code:</h2>
+    <pre>{{ code }}</pre>
+    
+    <h2>Submission Result:</h2>
+    {% if result.error %}
+        <p class="error">Error: {{ result.error }}</p>
+    {% else %}
+        <p>Success: {{ result.success }}</p>
+        <p>Score: {{ result.score }}</p>
+        <p>Message: {{ result.message }}</p>
+        {% if not result.success %}
+            <p>Expected answers: {{ result.expected }}</p>
+            <p>Your answers: {{ result.got }}</p>
+        {% endif %}
+    {% endif %}
+    
+    <a href="/practice/{{ unit_name }}">Try Again</a>
+</body>
+</html>
