@@ -1,0 +1,60 @@
+{
+  "unit1": {
+    "title": "Introduction to Variables and Basic Operations",
+    "description": "Complete the following tasks:\n\nPart A: Create a variable that stores the sum of 15 and 27.\n\nPart B: Create a variable that stores the result of 100 divided by 4.\n\nPart C: Create a variable that stores my favorite number (hint: its 42) multiplied by 2.\n\nYour submit_answers() function should return a list with three values: [part_a, part_b, part_c]",
+    "answers": [42, 25.0, 84],
+    "points": 100,
+    "num_parts": 3
+  },
+
+  "unit2": {
+    "title": "Data types and operators",
+    "description": "Complete the following tasks:\n\nPart A: Write an expression that takes a number (x) and returns True if x is even, and False if it is odd.\n\nPart B: Write an expression that returns True if a number (x) is greater than 11 and also odd.\n\nPart C: Write an expression that multiplies two numbers (x and y) and then floor divides the result by a third number (z).\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "answers": [true, true, 18],
+    "test_inputs": [[4, 7, 3], [13, 14, 5], [6, 9, 2]],
+    "points": 100,
+    "num_parts": 3
+  },
+
+  "unit3": {
+    "title": "Conditionals",
+    "description": "Complete the following tasks:\n\nPart A: Write a conditional that checks if a number x is negative, positive, or zero, and returns the corresponding string.\n\nPart B: Create an expression that returns True if x is divisible by both 3 and 7, otherwise False.\n\nPart C: Write a conditional that assigns 'Weekend' if day is 'Saturday' or 'Sunday', otherwise 'Weekday'.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "answers": ["Positive", true, "Weekday"],
+    "test_inputs": [[5], [21], ["Tuesday"]],
+    "points": 100,
+    "num_parts": 3
+  },
+
+  "unit4": {
+    "title": "Loops",
+    "description": "Complete the following tasks:\n\nPart A: Use a for loop to compute the sum of all even numbers between 1 and 100 (inclusive).\n\nPart B: Use a while loop to count how many times you can subtract 5 from 100 before the number becomes negative.\n\nPart C: Use a nested loop to count how many pairs (i, j) exist where both i and j range from 1 to 10 and i * j is even.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "answers": [2550, 21, 50],
+    "points": 100,
+    "num_parts": 3
+  },
+                         
+  "unit5": {
+    "title": "Lists",
+    "description": "Complete the following tasks:\n\nPart A: Create a list of the numbers 1–10 and return the sum of all elements at even indices.\n\nPart B: Return the length of a list after removing all elements greater than 5 from [2, 8, 3, 9, 1, 7, 4].\n\nPart C: Reverse the list [1, 2, 3, 4, 5] without using .reverse() or slicing.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "answers": [30, 4, [5, 4, 3, 2, 1]],
+    "points": 100,
+    "num_parts": 3
+  },
+
+  "unit6": {
+    "title": "Functions",
+    "description": "Complete the following tasks:\n\nPart A: Define a function square(n) that returns n ** 2, then call it with 7.\n\nPart B: Define a function compare(a, b) that returns 'Equal', 'Greater', or 'Smaller' depending on the relation between a and b.\n\nPart C: Write a higher-order function that takes another function f and a number x, and returns f(x) + 1; test it using your square function and x = 3.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "answers": [49, "Greater", 10],
+    "points": 100,
+    "num_parts": 3
+  },
+
+  "unit7": {
+    "title": "Outside Packages",
+    "description": "Complete the following tasks:\n\nPart A: Use the math module to calculate the factorial of 6.\n\nPart B: Enter the function call to get a random integer from 50-100. (do this in the format random.function(input1, input2)\n\nPart C: Use the turtle module to draw a square of side length 50, then return the number of sides drawn.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "answers": [720, "random.randint(50, 100)" , 4],
+    "points": 100,
+    "num_parts": 3
+  }
+
+}

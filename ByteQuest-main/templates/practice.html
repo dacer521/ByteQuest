@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ unit_data['title'] }}</title>
+<!-- CodeMirror CSS/JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/edit/closebrackets.min.js"></script>
+<style>
+body {
+font-family: sans-serif;
+margin: 40px;
+}
+.CodeMirror {
+border: 1px solid #ccc;
+height: 300px;
+font-size: 15px;
+}
+.instructions {
+background: #f5f5f5;
+padding: 15px;
+border-left: 4px solid #007bff;
+margin-bottom: 20px;
+white-space: pre-wrap;
+}
+</style>
+</head>
+<body>
+<h1>{{ unit_data['title'] }}</h1>
+<div class="instructions">
+<strong>Instructions:</strong>
+{{ unit_data['description'] }}
+</div>
+<p>Write your Python code below and click "Submit."</p>
+<form id="code-form" action="{{ url_for('submit_code') }}" method="POST">
+<input type="hidden" name="unit_name" value="{{ unit_name }}">
+<textarea id="code" name="code"></textarea>
+<br>
+<button type="submit">Submit Code</button>
+</form>
+<script>
+const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+mode: "python",
+lineNumbers: true,
+indentUnit: 4,
+autoCloseBrackets: true,
+});
+document.getElementById("code-form").addEventListener("submit", (e) => {
+document.querySelector("#code").value = editor.getValue();
+});
+</script>
+</body>
+</html>

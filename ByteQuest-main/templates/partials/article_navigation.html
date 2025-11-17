@@ -1,0 +1,27 @@
+{% if prev_article or next_article %}
+<hr class="my-4">
+<nav class="d-flex flex-column flex-md-row justify-content-between align-items-stretch gap-3">
+    <div class="d-flex flex-column text-start">
+        {% if prev_article %}
+        <span class="text-muted small">Previous</span>
+        <a class="btn btn-outline-secondary" href="{{ url_for('article', unit=prev_article.unit, slug=prev_article.slug) }}">
+            &larr; {{ prev_article.title }}
+        </a>
+        {% endif %}
+    </div>
+    {% if current_article %}
+    <div class="d-flex flex-column text-center justify-content-center">
+        <span class="text-muted small">You are reading</span>
+        <span class="fw-semibold">Unit {{ current_article.unit }}{% if current_article.unit_title %}: {{ current_article.unit_title }}{% endif %}</span>
+    </div>
+    {% endif %}
+    <div class="d-flex flex-column text-end">
+        {% if next_article %}
+        <span class="text-muted small">Next</span>
+        <a class="btn btn-outline-primary" href="{{ url_for('article', unit=next_article.unit, slug=next_article.slug) }}">
+            {{ next_article.title }} &rarr;
+        </a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
