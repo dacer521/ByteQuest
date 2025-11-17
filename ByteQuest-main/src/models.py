@@ -17,7 +17,7 @@ for chapter in range(1, 13):
     if article in (1,2,3): 
         article_count = 2; 
     else:
-        artile_count = 3
+        artile_count = 3 # i think this is wrong
 
     #actually adds a column for progress to article_1_1, then 1_2 1_3 2_1 (etc) 
     for article in range(1, article_count + 1):
