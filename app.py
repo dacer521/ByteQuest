@@ -24,6 +24,7 @@ ARTICLE_STRUCTURE = [
         "lessons": [
             {"slug": "1a", "title": "What is programming?"},
             {"slug": "1b", "title": "What are variables?"},
+            {"slug" : "1c", "title" : "What are print statements?"}
         ],
     },
     {
