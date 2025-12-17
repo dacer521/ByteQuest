@@ -1,27 +1,50 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Code Submission Result</title>
-</head>
-<body>
-    <h1>Results for {{ unit_name }}</h1>
-    
-    <h2>Your Code:</h2>
-    <pre>{{ code }}</pre>
-    
-    <h2>Submission Result:</h2>
-    {% if result.error %}
-        <p class="error">Error: {{ result.error }}</p>
-    {% else %}
-        <p>Success: {{ result.success }}</p>
-        <p>Score: {{ result.score }}</p>
-        <p>Message: {{ result.message }}</p>
-        {% if not result.success %}
-            <p>Expected answers: {{ result.expected }}</p>
-            <p>Your answers: {{ result.got }}</p>
-        {% endif %}
-    {% endif %}
-    
-    <a href="/practice/{{ unit_name }}">Try Again</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Practice result{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h3 mb-3">Results for {{ unit_name|capitalize }}</h1>
+                    {% if result.error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ result.error }}
+                    </div>
+                    {% else %}
+                    <div class="alert {% if result.success %}alert-success{% else %}alert-warning{% endif %}" role="alert">
+                        {{ result.message }}
+                        {% if result.success and next_unit %}
+                        <div class="small mt-2">Great job! The next unit is now unlocked.</div>
+                        {% endif %}
+                    </div>
+                    <dl class="row mb-3">
+                        <dt class="col-sm-3">Success</dt>
+                        <dd class="col-sm-9">{{ result.success }}</dd>
+                        <dt class="col-sm-3">Score</dt>
+                        <dd class="col-sm-9">{{ result.score }}</dd>
+                    </dl>
+                    {% if not result.success %}
+                    <div class="mb-3">
+                        <p class="mb-1 text-muted">Expected answers: {{ result.expected }}</p>
+                        <p class="mb-0 text-muted">Your answers: {{ result.got }}</p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-primary" href="{{ url_for('practice', unit_name=unit_name) }}">Try again</a>
+                        {% if result.success and next_unit %}
+                        {% if next_unit_first %}
+                        <a class="btn btn-outline-primary" href="{{ url_for('article', unit=next_unit_first.unit, slug=next_unit_first.slug) }}">
+                            Go to Unit {{ next_unit.unit }}
+                        </a>
+                        {% endif %}
+                        {% endif %}
+                        <a class="btn btn-secondary ms-auto" href="{{ url_for('index') }}">Back to home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

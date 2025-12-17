@@ -12,7 +12,7 @@ import codeEvaluator
 import json
 
 # Internal imports
-from db import init_db_command
+from db import init_db_command, get_db
 from user import User
 
 
@@ -55,12 +55,22 @@ ARTICLE_STRUCTURE = [
         ],
     },
     {
+        "unit": 5,
+        "title": "Lists",
+        "lessons": [],
+    },
+    {
         "unit": 6,
         "title": "Functions",
         "lessons": [
             {"slug": "6a", "title": "What are functions?"},
             {"slug": "6b", "title": "What are functions as function arguments?"},
         ],
+    },
+    {
+        "unit": 7,
+        "title": "Outside Packages",
+        "lessons": [],
     },
 ]
 
@@ -97,6 +107,127 @@ ARTICLE_LOOKUP, ARTICLE_SEQUENCE, ARTICLE_NAV = build_article_registry(
     ARTICLE_STRUCTURE
 )
 
+def ensure_progress_schema():
+    """Create the user progress table if it does not already exist."""
+    db = get_db()
+    db.execute(
+        """
+        CREATE TABLE IF NOT EXISTS user_progress (
+            user_id TEXT NOT NULL,
+            unit INTEGER NOT NULL,
+            lessons_read TEXT NOT NULL DEFAULT '[]',
+            practice_completed INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (user_id, unit),
+            FOREIGN KEY (user_id) REFERENCES user (id)
+        )
+        """
+    )
+    db.commit()
+
+def unit_name_to_number(unit_name):
+    if not unit_name:
+        return None
+    if unit_name.startswith("unit"):
+        try:
+            return int(unit_name.replace("unit", ""))
+        except ValueError:
+            return None
+    return None
+
+def get_unit_progress(user_id):
+    """Fetch saved lesson/practice status for the user."""
+    db = get_db()
+    rows = db.execute(
+        "SELECT unit, lessons_read, practice_completed FROM user_progress WHERE user_id = ?",
+        (user_id,),
+    ).fetchall()
+    progress = {}
+    for row in rows:
+        try:
+            lessons = json.loads(row["lessons_read"] or "[]")
+        except json.JSONDecodeError:
+            lessons = []
+        progress[row["unit"]] = {
+            "lessons_read": lessons,
+            "practice_completed": bool(row["practice_completed"]),
+        }
+    return progress
+
+def record_lesson_read(user_id, unit, slug):
+    """Mark a lesson as read for the user."""
+    db = get_db()
+    row = db.execute(
+        "SELECT lessons_read FROM user_progress WHERE user_id = ? AND unit = ?",
+        (user_id, unit),
+    ).fetchone()
+    if not row:
+        db.execute(
+            "INSERT INTO user_progress (user_id, unit, lessons_read, practice_completed) VALUES (?, ?, ?, 0)",
+            (user_id, unit, json.dumps([slug])),
+        )
+    else:
+        try:
+            lessons = set(json.loads(row["lessons_read"] or "[]"))
+        except json.JSONDecodeError:
+            lessons = set()
+        if slug not in lessons:
+            lessons.add(slug)
+            db.execute(
+                "UPDATE user_progress SET lessons_read = ? WHERE user_id = ? AND unit = ?",
+                (json.dumps(list(lessons)), user_id, unit),
+            )
+    db.commit()
+
+def record_practice_completed(user_id, unit):
+    """Persist that the user finished a unit's practice."""
+    db = get_db()
+    row = db.execute(
+        "SELECT 1 FROM user_progress WHERE user_id = ? AND unit = ?",
+        (user_id, unit),
+    ).fetchone()
+    if not row:
+        db.execute(
+            "INSERT INTO user_progress (user_id, unit, lessons_read, practice_completed) VALUES (?, ?, '[]', 1)",
+            (user_id, unit),
+        )
+    else:
+        db.execute(
+            "UPDATE user_progress SET practice_completed = 1 WHERE user_id = ? AND unit = ?",
+            (user_id, unit),
+        )
+    db.commit()
+
+def build_learning_state(user_id=None):
+    """Return per-unit lock/unlock status for templates and route guards."""
+    state = {"units": {}}
+    progress_map = get_unit_progress(user_id) if user_id else {}
+    chain_unlocked = True
+
+    for unit in ARTICLE_STRUCTURE:
+        unit_num = unit["unit"]
+        lesson_slugs = [lesson["slug"] for lesson in unit["lessons"]]
+        unit_progress = progress_map.get(unit_num, {})
+        lessons_read = set(unit_progress.get("lessons_read", []))
+        practice_completed = bool(unit_progress.get("practice_completed"))
+
+        article_unlocked = chain_unlocked
+        lessons_read_count = len(lessons_read.intersection(set(lesson_slugs)))
+        all_lessons_read = article_unlocked and lessons_read_count >= len(lesson_slugs)
+        practice_unlocked = (article_unlocked and all_lessons_read) or practice_completed
+
+        state["units"][unit_num] = {
+            "article_unlocked": article_unlocked,
+            "practice_unlocked": practice_unlocked,
+            "practice_completed": practice_completed,
+            "lessons_read_count": lessons_read_count,
+            "lessons_total": len(lesson_slugs),
+        }
+
+        # Next units unlock only after current practice is completed
+        chain_unlocked = chain_unlocked and practice_completed
+
+    return state
+
 # Configuration
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", None) 
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", None)
@@ -130,8 +261,12 @@ def create_app(test_config=None):
 
     @app.context_processor
     def inject_navigation():
+        learning_state = (
+            build_learning_state(current_user.id) if current_user.is_authenticated else build_learning_state(None)
+        )
         return {
             "ARTICLE_NAV": ARTICLE_NAV,
+            "LEARNING_STATE": learning_state,
         }
     
     login_manager.login_view = "index" #this makes it so when they try to access a page that needs a login, they are redirected to main page.
@@ -143,6 +278,10 @@ def create_app(test_config=None):
     # Ensure the database is initialized manually via CLI
     # Make sure that you are in the venv and run `flask init-db`
     app.cli.add_command(init_db_command)
+
+    # Ensure the progress table exists
+    with app.app_context():
+        ensure_progress_schema()
 
     #TODO: should probably add error handling to this
     def get_google_provider_cfg():
@@ -241,26 +380,75 @@ def create_app(test_config=None):
     @app.route("/practice/<unit_name>")
     @login_required
     def practice(unit_name):
+        unit_number = unit_name_to_number(unit_name)
+        learning_state = build_learning_state(current_user.id)
+        unit_state = learning_state["units"].get(unit_number, {})
+        if not unit_state.get("article_unlocked"):
+            abort(403)
+        if not unit_state.get("practice_unlocked"):
+            abort(403)
+
         # Load the unit data to pass to template
         unit_data = codeEvaluator.get_unit_data(unit_name)
         if not unit_data:
             return "Unit not found", 404
-        return render_template("practice.html", unit_name=unit_name, unit_data=unit_data)
+        return render_template(
+            "practice.html",
+            unit_name=unit_name,
+            unit_data=unit_data,
+            learning_state=learning_state,
+        )
 
 
     @app.route("/submit_code", methods=["POST"])
     @login_required
     def submit_code():
         unit_name = request.form.get("unit_name")
+        unit_number = unit_name_to_number(unit_name) if unit_name else None
         code = request.form.get("code")
+
+        learning_state = build_learning_state(current_user.id)
+        unit_state = learning_state["units"].get(unit_number, {}) if unit_number else {}
+        if not unit_state.get("practice_unlocked"):
+            abort(403)
+
         result = codeEvaluator.evaluate_submission(unit_name, code)
-        return render_template("result.html", unit_name=unit_name, code=code, result=result)
+
+        next_unit = None
+        next_unit_first = None
+        if unit_number is not None:
+            for idx, unit in enumerate(ARTICLE_STRUCTURE):
+                if unit["unit"] == unit_number and idx + 1 < len(ARTICLE_STRUCTURE):
+                    next_unit = ARTICLE_STRUCTURE[idx + 1]
+                    if next_unit.get("lessons"):
+                        first_slug = next_unit["lessons"][0]["slug"]
+                        next_unit_first = ARTICLE_LOOKUP.get((next_unit["unit"], first_slug))
+                    break
+
+        if result.get("success") and unit_number:
+            record_practice_completed(current_user.id, unit_number)
+        learning_state = build_learning_state(current_user.id)
+
+        return render_template(
+            "result.html",
+            unit_name=unit_name,
+            code=code,
+            result=result,
+            next_unit=next_unit,
+            next_unit_first=next_unit_first,
+            learning_state=learning_state,
+        )
 
     @app.route("/articles/<int:unit>/<slug>")
+    @login_required
     def article(unit, slug):
         article_meta = ARTICLE_LOOKUP.get((unit, slug))
         if not article_meta:
             abort(404)
+        learning_state = build_learning_state(current_user.id)
+        unit_state = learning_state["units"].get(unit, {})
+        if not unit_state.get("article_unlocked"):
+            abort(403)
         prev_article = (
             ARTICLE_SEQUENCE[article_meta["index"] - 1]
             if article_meta["index"] > 0
@@ -271,11 +459,20 @@ def create_app(test_config=None):
             if article_meta["index"] < len(ARTICLE_SEQUENCE) - 1
             else None
         )
+        if next_article:
+            next_unit_state = learning_state["units"].get(next_article["unit"], {})
+            if not next_unit_state.get("article_unlocked"):
+                next_article = None
+
+        # Mark lesson as read for gating purposes
+        record_lesson_read(current_user.id, unit, slug)
+        learning_state = build_learning_state(current_user.id)
         return render_template(
             article_meta["template"],
             current_article=article_meta,
             prev_article=prev_article,
             next_article=next_article,
+            learning_state=learning_state,
         )
 
     

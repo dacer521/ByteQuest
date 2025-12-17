@@ -9,11 +9,20 @@
                 Explore step-by-step lessons that build your Python fundamentals. Work through each article,
                 then practice what you learned with interactive coding challenges.
             </p>
+            {% set first_unit = ARTICLE_NAV|first %}
+            {% set first_lesson = first_unit.lessons[0] if first_unit and first_unit.lessons else None %}
+            {% set first_unit_state = LEARNING_STATE.units.get(first_unit.unit) if first_unit and LEARNING_STATE else {} %}
             <div class="d-flex flex-wrap gap-2">
                 {% if current_user.is_authenticated %}
-                <a class="btn btn-primary" href="{{ url_for('practice', unit_name='unit1') }}">
+                {% if first_unit_state.practice_unlocked and first_unit %}
+                <a class="btn btn-primary" href="{{ url_for('practice', unit_name='unit' ~ first_unit.unit) }}">
                     Continue to practice
                 </a>
+                {% elif first_lesson %}
+                <a class="btn btn-primary" href="{{ url_for('article', unit=first_lesson.unit, slug=first_lesson.slug) }}">
+                    Start learning Unit {{ first_unit.unit }}
+                </a>
+                {% endif %}
                 <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Sign out</a>
                 {% else %}
                 <a class="btn btn-primary" href="{{ url_for('login') }}">Sign in with Google</a>
@@ -37,9 +46,15 @@
                     <p class="mb-3">
                         Choose an article below or jump into practice to reinforce what you have learned.
                     </p>
-                    <a class="btn btn-primary w-100 mb-2" href="{{ url_for('practice', unit_name='unit1') }}">
+                    {% if first_unit_state.practice_unlocked and first_unit %}
+                    <a class="btn btn-primary w-100 mb-2" href="{{ url_for('practice', unit_name='unit' ~ first_unit.unit) }}">
                         Open practice
                     </a>
+                    {% elif first_lesson %}
+                    <a class="btn btn-primary w-100 mb-2" href="{{ url_for('article', unit=first_lesson.unit, slug=first_lesson.slug) }}">
+                        Start Unit {{ first_unit.unit }}
+                    </a>
+                    {% endif %}
                     <a class="btn btn-outline-secondary w-100" href="{{ url_for('logout') }}">Sign out</a>
                     {% else %}
                     <h2 class="h5 mb-3">Learning made simple</h2>
@@ -60,26 +75,77 @@
 
     <div class="row g-4">
         {% for unit in ARTICLE_NAV %}
+        {% set unit_state = LEARNING_STATE.units.get(unit.unit) if LEARNING_STATE and LEARNING_STATE.units else {} %}
+        {% set articles_locked = (not unit_state.get("article_unlocked", False)) or (not current_user.is_authenticated) %}
+        {% set practice_ready = unit_state.get("practice_unlocked", False) %}
+        {% set practice_completed = unit_state.get("practice_completed", False) %}
+        {% set lessons_total = unit_state.lessons_total | default(unit.lessons|length) %}
+        {% set lessons_read = unit_state.lessons_read_count | default(0) %}
         <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm {% if articles_locked %}border-dashed{% endif %}">
                 <div class="card-body d-flex flex-column">
                     <h3 class="h5 mb-3">
                         Unit {{ unit.unit }}{% if unit.title %}: {{ unit.title }}{% endif %}
                     </h3>
+                    <p class="text-muted small mb-2">
+                        {% if not current_user.is_authenticated %}
+                        Sign in to unlock this unit
+                        {% elif not unit_state.get("article_unlocked", False) %}
+                        Finish the previous unit's practice to unlock
+                        {% elif practice_completed %}
+                        Practice completed
+                        {% elif practice_ready %}
+                        Practice unlocked
+                        {% else %}
+                        Read the articles to unlock practice
+                        {% endif %}
+                    </p>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="progress flex-grow-1" style="height: 0.6rem;">
+                            <div class="progress-bar" role="progressbar" style="width: {% if lessons_total > 0 %}{{ (lessons_read / lessons_total) * 100 }}{% else %}0{% endif %}%;" aria-valuenow="{{ lessons_read }}" aria-valuemin="0" aria-valuemax="{{ lessons_total }}"></div>
+                        </div>
+                        <span class="text-muted small">
+                            {{ lessons_read }}/{{ lessons_total }}
+                        </span>
+                    </div>
                     <ul class="list-unstyled flex-grow-1 mb-3">
                         {% for lesson in unit.lessons %}
                         <li class="mb-2">
+                            {% if articles_locked %}
+                            <span class="text-muted d-inline-flex align-items-center gap-2">
+                                <span class="badge bg-secondary">Locked</span>
+                                {{ lesson.title }}
+                            </span>
+                            {% else %}
                             <a class="link-primary text-decoration-none" href="{{ url_for('article', unit=lesson.unit, slug=lesson.slug) }}">
                                 {{ lesson.title }}
                             </a>
+                            {% endif %}
                         </li>
                         {% endfor %}
                     </ul>
                     {% set first_lesson = unit.lessons|first %}
                     {% if first_lesson %}
-                    <a class="btn btn-outline-primary btn-sm mt-auto align-self-start" href="{{ url_for('article', unit=first_lesson.unit, slug=first_lesson.slug) }}">
-                        Start unit
-                    </a>
+                    <div class="d-flex gap-2">
+                        {% if articles_locked %}
+                        {% if not current_user.is_authenticated %}
+                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('login') }}">Sign in to start</a>
+                        {% else %}
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Locked</button>
+                        {% endif %}
+                        {% else %}
+                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('article', unit=first_lesson.unit, slug=first_lesson.slug) }}">
+                            Start unit
+                        </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated %}
+                        <a class="btn btn-primary btn-sm {% if not practice_ready %}disabled{% endif %}" href="{% if practice_ready %}{{ url_for('practice', unit_name='unit' ~ unit.unit) }}{% else %}#{% endif %}" {% if not practice_ready %}tabindex="-1" aria-disabled="true"{% endif %}>
+                            {% if practice_completed %}Retake practice{% else %}Practice{% endif %}
+                        </a>
+                        {% else %}
+                        <a class="btn btn-primary btn-sm" href="{{ url_for('login') }}">Sign in to unlock</a>
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
             </div>
