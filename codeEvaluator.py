@@ -57,6 +57,7 @@ def evaluate_submission(unit_name, code):
         return {
             "success": False, 
             "score": 0,
+            "expected": expected_answers,
             "got": captured_answers,
             "message": "Some answers are incorrect"
         }

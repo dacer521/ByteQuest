@@ -127,6 +127,28 @@ a:hover {
     color: var(--accent-color);
 }
 
+.border-dashed {
+    border: 1px dashed var(--border-color);
+}
+
+.progress {
+    background-color: rgba(86, 98, 255, 0.1);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--accent-color), #3d4ad9);
+}
+
+.card .badge.bg-light {
+    background-color: #f4f5f8 !important;
+}
+
+.btn.disabled,
+.btn:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
 @media (max-width: 576px) {
     .article-page .page-content {
         padding: 1.75rem 1.25rem 2.25rem;

@@ -35,12 +35,30 @@
                 </a>
                 <ul class="dropdown-menu">
                   {% for unit in ARTICLE_NAV %}
+                  {% set unit_state = LEARNING_STATE.units.get(unit.unit) if LEARNING_STATE and LEARNING_STATE.units else {} %}
+                  {% set locked = (not unit_state.get("article_unlocked", False)) or (not current_user.is_authenticated) %}
                   <li>
-                    <h6 class="dropdown-header">Unit {{ unit.unit }}{% if unit.title %} – {{ unit.title }}{% endif %}</h6>
+                    <h6 class="dropdown-header d-flex align-items-center justify-content-between">
+                        <span>Unit {{ unit.unit }}{% if unit.title %} – {{ unit.title }}{% endif %}</span>
+                        {% if locked %}
+                        <span class="badge bg-secondary">Locked</span>
+                        {% elif unit_state.practice_completed %}
+                        <span class="badge bg-success">Practice done</span>
+                        {% elif unit_state.practice_unlocked %}
+                        <span class="badge bg-primary">Practice unlocked</span>
+                        {% endif %}
+                    </h6>
                   </li>
                   {% for lesson in unit.lessons %}
                   <li>
+                    {% if locked %}
+                    <span class="dropdown-item disabled text-muted d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-secondary border">Locked</span>
+                        {{ lesson.title }}
+                    </span>
+                    {% else %}
                     <a class="dropdown-item {% if current_article and current_article.unit == lesson.unit and current_article.slug == lesson.slug %}active{% endif %}" href="{{ url_for('article', unit=lesson.unit, slug=lesson.slug) }}">{{ lesson.title }}</a>
+                    {% endif %}
                   </li>
                   {% endfor %}
                   {% if not loop.last %}
