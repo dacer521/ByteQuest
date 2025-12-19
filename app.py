@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 import RestrictedPython
+from dotenv import load_dotenv
+load_dotenv() # loads the .env file so os.getenv can find the variables
 import codeEvaluator
 import json
 
