@@ -1,63 +1,42 @@
 import json
 import os
-from RestrictedPython import compile_restricted, safe_globals
+import subprocess
+import sys
+
+BASE_DIR = os.path.dirname(__file__)
+ANSWER_PATH = os.path.join(BASE_DIR, "data", "unit_answers.json")
+RUNNER_PATH = os.path.join(BASE_DIR, "sandbox_runner.py")
+EXEC_TIMEOUT_SECONDS = 3
 
 
-#gets unit info
+# gets unit info
 def get_unit_data(unit_name):
     return ANSWER_KEYS.get(unit_name)
 
-with open('data/unit_answers.json', 'r') as f:
+
+with open(ANSWER_PATH, "r") as f:
     ANSWER_KEYS = json.load(f)
 
-#main method
+
+# main method
 def evaluate_submission(unit_name, code):
+    payload = json.dumps({"unit_name": unit_name, "code": code})
+    try:
+        result = subprocess.run(
+            [sys.executable, RUNNER_PATH],
+            input=payload.encode("utf-8"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=EXEC_TIMEOUT_SECONDS,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {"error": "Your code took too long to run."}
 
-    unit_data = ANSWER_KEYS.get(unit_name)
-    
-    if not unit_data:
-        return {"error": f"Unit {unit_name} not found"}
-    
-    expected_answers = unit_data['answers']
-    
-
-    captured_answers = []
-    
-
-    def submit_answers(ans1, ans2, ans3):
-        captured_answers.extend([ans1, ans2, ans3])
-    
+    if result.returncode != 0:
+        return {"error": "Code execution failed."}
 
     try:
-        byte_code = compile_restricted(code, '<user_code>', 'exec')
-    except Exception as e:
-        return {"error": f"Code compilation error: {str(e)}"}
-    
-
-    restricted_globals = safe_globals.copy()
-    restricted_globals['submit_answers'] = submit_answers 
-    restricted_locals = {}
-    
-    #runs code without security risk bc restricted python 
-    try:
-        exec(byte_code, restricted_globals, restricted_locals)
-    except Exception as e:
-        return {"error": f"Error running your code: {str(e)}"}
-    
-
-    if not captured_answers:
-        return {"error": "You didn't call submitAnswers() with 3 arguments"}
-    
-
-    if captured_answers == expected_answers:
-        return {"success": True, "score": unit_data['points'], "message": "All correct!"}
-    
-    #updates how they do
-    else:
-        return {
-            "success": False, 
-            "score": 0,
-            "expected": expected_answers,
-            "got": captured_answers,
-            "message": "Some answers are incorrect"
-        }
+        return json.loads(result.stdout.decode("utf-8"))
+    except json.JSONDecodeError:
+        return {"error": "Invalid response from code runner."}
