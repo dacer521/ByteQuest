@@ -385,6 +385,7 @@ def create_app(test_config=None):
             client_credential=MICROSOFT_CLIENT_SECRET,
         )
         redirect_uri = url_for("microsoft_callback", _external=True)
+        redirect_uri = url_for("microsoft_callback", _external=True)
         auth_url = ms_auth.get_authorization_request_url(
             scopes=["User.Read"],
             redirect_uri=redirect_uri,
