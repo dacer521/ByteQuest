@@ -459,7 +459,8 @@ def create_app(test_config=None):
         unique_id = user_info.get("id")
         users_email = user_info.get("mail") or user_info.get("userPrincipalName")
         users_name = user_info.get("displayName") or user_info.get("givenName", "User")
-
+        #TODO: Either get Microsoft profile pictures (User.Read scope doesn't provide this)
+        # or forget it and use either a template image or a transparent image.
         picture = "static/images/logo.png"
         
         if not unique_id or not users_email:
