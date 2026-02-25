@@ -277,8 +277,9 @@ def create_app(test_config=None):
     def load_user(user_id):
         return User.get(user_id)
 
-    # Ensure the database is initialized manually via CLI
-    # Make sure that you are in the venv and run `flask init-db`
+    # ------------Ensure the database is initialized manually via CLI------------------------------
+    # ------------Make sure that you are in the venv and run `flask init-db`-----------------------
+    # ------------Ensure the database is initialized manually via CLI------------------------------
     app.cli.add_command(init_db_command)
 
     # Ensure the progress table exists
@@ -304,8 +305,8 @@ def create_app(test_config=None):
             "index.html",
         )
 
-    @app.route("/login")
-    def login():
+    @app.route("/logingoogle")
+    def logingoogle():
         # Find out what URL to hit for Google login
         google_provider_cfg = get_google_provider_cfg()
         authorization_endpoint = google_provider_cfg["authorization_endpoint"]
@@ -320,7 +321,7 @@ def create_app(test_config=None):
         )
         return redirect(request_uri)
     
-    @app.route("/login/callback")
+    @app.route("/logingoogle/callback")
     def callback():
         #Gets auth code google sent
         code = request.args.get("code");
