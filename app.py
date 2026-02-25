@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv() # loads the .env file so os.getenv can find the variables
 import codeEvaluator
 import json
+import msal
 
 # Internal imports
 from db import init_db_command, get_db
@@ -235,6 +236,12 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", None)
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
+# Microsoft OAuth Configuration
+MICROSOFT_CLIENT_ID = os.getenv("MICROSOFT_CLIENT_ID", None)
+MICROSOFT_CLIENT_SECRET = os.getenv("MICROSOFT_CLIENT_SECRET", None)
+MICROSOFT_TENANT_ID = os.getenv("MICROSOFT_TENANT_ID", "common")  # Use "common" for multi-tenant
+MICROSOFT_AUTHORITY_URL = f"https://login.microsoftonline.com/{MICROSOFT_TENANT_ID}"
+
 def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -365,6 +372,77 @@ def create_app(test_config=None):
             User.create(unique_id,users_name,users_email,picture)
         
         #log user in then send them to home page
+        login_user(user)
+        return redirect(url_for("index"))
+    
+    # Microsoft Authentication Routes
+    @app.route("/loginmicrosoft")
+    def loginmicrosoft():
+        session = request.session = requests.Session()
+        ms_auth = msal.PublicClientApplication(
+            MICROSOFT_CLIENT_ID,
+            authority=MICROSOFT_AUTHORITY_URL
+        )
+        auth_url = ms_auth.get_authorization_request_url(
+            scopes=["User.Read"],
+            redirect_uri=request.base_url + "callback"
+        )
+        return redirect(auth_url)
+    
+    @app.route("/loginmicrosoft/callback")
+    def microsoft_callback():
+        code = request.args.get("code")
+        if not code:
+            return "Authorization code not found", 400
+        
+        ms_auth = msal.PublicClientApplication(
+            MICROSOFT_CLIENT_ID,
+            authority=MICROSOFT_AUTHORITY_URL
+        )
+        
+        try:
+            token_response = ms_auth.acquire_token_by_authorization_code(
+                code,
+                scopes=["User.Read"],
+                redirect_uri=request.base_url
+            )
+        except Exception as e:
+            return f"Error acquiring token: {str(e)}", 400
+        
+        if "error" in token_response:
+            return f"Error: {token_response['error']}", 400
+        
+        # Get user info from Microsoft Graph
+        access_token = token_response["access_token"]
+        headers = {"Authorization": f"Bearer {access_token}"}
+        
+        try:
+            userinfo_response = requests.get(
+                "https://graph.microsoft.com/v1.0/me",
+                headers=headers
+            )
+            user_info = userinfo_response.json()
+        except Exception as e:
+            return f"Error fetching user info: {str(e)}", 400
+        
+        # Extract user information
+        unique_id = user_info.get("id")
+        users_email = user_info.get("mail") or user_info.get("userPrincipalName")
+        users_name = user_info.get("displayName") or user_info.get("givenName", "User")
+        picture = None  # Microsoft doesn't provide picture in basic User.Read scope
+        
+        if not unique_id or not users_email:
+            return "Unable to get user information from Microsoft", 400
+        
+        # Add "microsoft_" prefix to avoid conflicts with Google IDs
+        unique_id = f"microsoft_{unique_id}"
+        
+        # Create or retrieve user
+        user = User(id_=unique_id, name=users_name, email=users_email, profile_pic=picture)
+        if not User.get(unique_id):
+            User.create(unique_id, users_name, users_email, picture)
+        
+        # Log user in
         login_user(user)
         return redirect(url_for("index"))
     
