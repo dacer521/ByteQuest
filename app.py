@@ -383,9 +383,10 @@ def create_app(test_config=None):
             MICROSOFT_CLIENT_ID,
             authority=MICROSOFT_AUTHORITY_URL
         )
+        redirect_uri = url_for("microsoft_callback", _external=True)
         auth_url = ms_auth.get_authorization_request_url(
             scopes=["User.Read"],
-            redirect_uri=request.base_url + "callback"
+            redirect_uri=redirect_uri
         )
         return redirect(auth_url)
     
@@ -400,11 +401,12 @@ def create_app(test_config=None):
             authority=MICROSOFT_AUTHORITY_URL
         )
         
+        redirect_uri = url_for("microsoft_callback", _external=True)
         try:
             token_response = ms_auth.acquire_token_by_authorization_code(
                 code,
                 scopes=["User.Read"],
-                redirect_uri=request.base_url
+                redirect_uri=redirect_uri
             )
         except Exception as e:
             return f"Error acquiring token: {str(e)}", 400
