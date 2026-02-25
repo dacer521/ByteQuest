@@ -366,12 +366,25 @@ def create_app(test_config=None):
             return "User email not available or not verified by Google", 400
         
         #FINALLY, create the user in the database using info provided by Google.
-        user = User(id_=unique_id,name=users_name,email=users_email,profile_pic=picture)
-        #add user to db if they aren't already in it
-        if not User.get(unique_id):
-            User.create(unique_id,users_name,users_email,picture)
-        
-        #log user in then send them to home page
+        # Prefer to find an existing account by id, then by email. If an account
+        # with the same email exists from another provider, reuse it instead of
+        # inserting a duplicate email row.
+        user = None
+        existing_by_id = User.get(unique_id)
+        if existing_by_id:
+            user = existing_by_id
+        else:
+            existing_by_email = User.get_by_email(users_email)
+            if existing_by_email:
+                # Update display info and reuse the account
+                User.update_profile(existing_by_email.id, users_name, picture)
+                user = existing_by_email
+            else:
+                # No existing account - create a new one
+                User.create(unique_id, users_name, users_email, picture)
+                user = User.get(unique_id)
+
+        # Log user in then send them to home page
         login_user(user)
         return redirect(url_for("index"))
     
@@ -384,7 +397,11 @@ def create_app(test_config=None):
             authority=MICROSOFT_AUTHORITY_URL,
             client_credential=MICROSOFT_CLIENT_SECRET,
         )
-        redirect_uri = url_for("microsoft_callback", _external=True)
+        # Prefer an explicit redirect URI from environment (helps ensure it matches
+        # the value registered in Azure). If not provided, fall back to the
+        # dynamically-generated external URL.
+        redirect_uri = os.getenv("MICROSOFT_REDIRECT_URI") or url_for("microsoft_callback", _external=True)
+        app.logger.info(f"Microsoft redirect_uri used: {redirect_uri}")
         auth_url = ms_auth.get_authorization_request_url(
             scopes=["User.Read"],
             redirect_uri=redirect_uri,
@@ -403,7 +420,11 @@ def create_app(test_config=None):
             client_credential=MICROSOFT_CLIENT_SECRET,
         )
 
-        redirect_uri = url_for("microsoft_callback", _external=True)
+        # Use the same redirect URI that was used to build the authorization URL.
+        # Prefer the explicit environment value so the value that Azure sees
+        # matches what we send back when exchanging the code for a token.
+        redirect_uri = os.getenv("MICROSOFT_REDIRECT_URI") or url_for("microsoft_callback", _external=True)
+        app.logger.info(f"Microsoft callback redirect_uri used: {redirect_uri}")
         try:
             token_response = ms_auth.acquire_token_by_authorization_code(
                 code,
@@ -411,10 +432,15 @@ def create_app(test_config=None):
                 redirect_uri=redirect_uri,
             )
         except Exception as e:
+            app.logger.error(f"Error acquiring token exception: {e}")
             return f"Error acquiring token: {str(e)}", 400
         
         if "error" in token_response:
-            return f"Error: {token_response['error']}", 400
+            # Log error details (avoid printing client secrets) to help debugging.
+            err = token_response.get("error")
+            desc = token_response.get("error_description") or token_response.get("error_uri")
+            app.logger.error(f"MSAL token error: {err} - {desc}")
+            return f"Error: {err} - {desc}", 400
         
         # Get user info from Microsoft Graph
         access_token = token_response["access_token"]
@@ -433,19 +459,31 @@ def create_app(test_config=None):
         unique_id = user_info.get("id")
         users_email = user_info.get("mail") or user_info.get("userPrincipalName")
         users_name = user_info.get("displayName") or user_info.get("givenName", "User")
-        picture = None  # Microsoft doesn't provide picture in basic User.Read scope
+
+        picture = "static/images/logo.png"
         
         if not unique_id or not users_email:
             return "Unable to get user information from Microsoft", 400
         
-        # Add "microsoft_" prefix to avoid conflicts with Google IDs
-        unique_id = f"microsoft_{unique_id}"
-        
-        # Create or retrieve user
-        user = User(id_=unique_id, name=users_name, email=users_email, profile_pic=picture)
-        if not User.get(unique_id):
-            User.create(unique_id, users_name, users_email, picture)
-        
+        # Add "microsoft_" prefix to the provider id to keep provider ids
+        # distinct, but prefer to reuse an existing account by email if present.
+        provider_id = f"microsoft_{unique_id}"
+
+        user = None
+        existing_by_id = User.get(provider_id)
+        if existing_by_id:
+            user = existing_by_id
+        else:
+            existing_by_email = User.get_by_email(users_email)
+            if existing_by_email:
+                # Reuse existing account tied to this email
+                User.update_profile(existing_by_email.id, users_name, picture)
+                user = existing_by_email
+            else:
+                # Create a new provider-scoped account
+                User.create(provider_id, users_name, users_email, picture)
+                user = User.get(provider_id)
+
         # Log user in
         login_user(user)
         return redirect(url_for("index"))
