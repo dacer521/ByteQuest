@@ -9,7 +9,7 @@ from oauthlib.oauth2 import WebApplicationClient
 import requests
 import RestrictedPython
 from dotenv import load_dotenv
-load_dotenv() # loads the .env file so os.getenv can find the variables
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env')) # explicit path so Apache/WSGI can find it
 import codeEvaluator
 import json
 import msal
@@ -604,10 +604,13 @@ def create_app(test_config=None):
     return app
 
 
+# WSGI entry point for Apache mod_wsgi
+# Apache expects a module-level variable named 'application'
+application = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
+    app = application
     #USE THIS IF TESTING LOCALLY (until we get a website with a certificate.)
     #This is only so we can test without annoying "this website is not secure errors", it's unencrypted
     #use "localhost:5000"
     app.run(host="0.0.0.0", port=5000)
-    
