@@ -14,7 +14,7 @@ def get_unit_data(unit_name):
     return ANSWER_KEYS.get(unit_name)
 
 
-with open(ANSWER_PATH, "r") as f:
+with open(ANSWER_PATH, "r", encoding="utf-8") as f:
     ANSWER_KEYS = json.load(f)
 
 
