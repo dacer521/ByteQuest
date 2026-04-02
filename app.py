@@ -613,4 +613,4 @@ if __name__ == "__main__":
     #USE THIS IF TESTING LOCALLY (until we get a website with a certificate.)
     #This is only so we can test without annoying "this website is not secure errors", it's unencrypted
     #use "localhost:5000"
-    app.run(host="0.0.0.0", port=5000)
+    #app.run(ssl_context=("cert.pem","key.pem"))
