@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}What are outside packages and how do you import them?{% endblock %}
+
+{% block content %}
+<h1>What are outside packages and how do you import them? </h1>
+
+<p>Outside Packages, often referred to as libraries, help python do things that it cannot easily do. </p> <br> 
+
+<p>For example, if you want to get a random number, you cannot easily do that. </p> <br> 
+
+ <p>You would have to make your own function that would do that; which is clunky and complex. </p> <br>  
+
+<p>That’s where an outside package could help you; the Random library. </p> <br>  
+
+<p>The random library has a ton of functions that can help you, such as the random() function, which returns a float number between 0 and 1. </p> <br> 
+
+<img src = "../../../static/images/code50.jpg" alt = "python code"> <br>  
+
+
+<p>That is a small fraction of how useful modules are to programmers. </p> <br> 
+
+ <p>Now that we’ve seen how useful modules can be, how do you get them in your program? </p> <br> 
+
+ <p>Modules can be imported through the ‘import’ keyword, then specifying what module you want to import. </p> <br> 
+
+
+ <img src = "../../../static/images/code51.jpg" alt = "python code"> <br>  
+
+ 
+
+<p>But what if you don’t want to import everything from that library? </p> <br> 
+
+ <p>If you just want one function, for example, the random() function, just put the keyword ‘from’, then the library the function is, the keyword ‘import’ and then the function you want to import. </p> <br> 
+  <img src = "../../../static/images/code52.jpg" alt = "python code"> 
+
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

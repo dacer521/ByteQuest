@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}What are lists?{% endblock %}
+
+{% block content %}
+<h1>What are lists?</h1>
+
+<p>Lists are extremely useful in python, allowing you to hold important information that you don’t want to assign to a variable. </p><br> 
+
+<p> Lists are mutable objects that contain a series of items and can be declared by making your object = []. </p> 
+
+<p>Or, if you already have some things to put in there, can be set equal to [ item1, Item2, item3].  </p> <br> <br>
+
+<p>List without anything inside: </p> <br>
+
+<img src = "../../../static/images/code43.jpg" alt = "python code"><br> 
+
+<p>List with things inside: </p> <br>
+
+<img src = "../../../static/images/code44.jpg" alt = "python code"><br> 
+
+
+<p>For instance, you want to make a program that asks the user to give a list of their favorite numbers, the user might be weird and have a large amount of numbers they really like; <br>instead of making a variable for each, just store the values in a list. </p><br> 
+
+<img src = "../../../static/images/code45.jpg" alt = "python code"> <br> 
+
+
+<p>One of the greatest things about lists is that the values stored in them don’t have to be the same datatype.</p><br> 
+
+
+<p> For example, this would allow you to hold the name, date of birth and favorite number all in one list!</p> <br> 
+
+<img src = "../../../static/images/code46.jpg" alt = "python code"><br> 
+
+
+<p>You can access items in a list by doing list[1], one being the position of whatever you want to access. </P><br> 
+
+<p> If it is also important to note that lists start indexing at zero so if you try to get the first thing in the list, you actually write list[0]. </p> 
+
+<img src = "../../../static/images/code47.jpg" alt = "python code"> <br> 
+
+{% include 'partials/article_navigation.html' %}
+{% endblock %}

@@ -60,7 +60,8 @@ ARTICLE_STRUCTURE = [
     {
         "unit": 5,
         "title": "Lists",
-        "lessons": [],
+        "lessons": [{"slug": "5a", "title": "What are lists?"},
+                    {"slug": "5b", "title": "Lists and Loops."}],
     },
     {
         "unit": 6,
@@ -73,7 +74,11 @@ ARTICLE_STRUCTURE = [
     {
         "unit": 7,
         "title": "Outside Packages",
-        "lessons": [],
+        "lessons": [{"slug": "7a", "title": "What are outside packages and how do you import them?"},
+                    {"slug": "7b", "title": "What is the Math module? "},
+                    {"slug": "7c", "title": "What is the random module? "},
+                    {"slug": "7d", "title": "Can you import other files? "}
+                    ],
     },
 ]
 
