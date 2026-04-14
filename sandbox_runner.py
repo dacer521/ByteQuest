@@ -3,12 +3,35 @@ import os
 import resource
 import sys
 from RestrictedPython import compile_restricted, safe_globals
+from RestrictedPython.Guards import guarded_iter_unpack_sequence
+import operator
+import math
+import random
 
 BASE_DIR = os.path.dirname(__file__)
 ANSWER_PATH = os.path.join(BASE_DIR, "data", "unit_answers.json")
 
 CPU_TIME_SECONDS = 2
 MEMORY_LIMIT_BYTES = 128 * 1024 * 1024
+
+
+# Helper function for in-place operations (+=, -=, etc.)
+def _inplacevar_(op, x, y):
+    ops = {
+        '+=': operator.iadd,
+        '-=': operator.isub,
+        '*=': operator.imul,
+        '/=': operator.itruediv,
+        '//=': operator.ifloordiv,
+        '%=': operator.imod,
+        '**=': operator.ipow,
+        '&=': operator.iand,
+        '|=': operator.ior,
+        '^=': operator.ixor,
+        '>>=': operator.irshift,
+        '<<=': operator.ilshift,
+    }
+    return ops.get(op, operator.iadd)(x, y)
 
 
 def apply_limits():
@@ -49,8 +72,20 @@ def evaluate(unit_name, code, answer_keys):
     except Exception as exc:
         return {"error": f"Code compilation error: {str(exc)}"}
 
+    # Set up restricted globals with necessary guard functions for loops and iteration
     restricted_globals = safe_globals.copy()
     restricted_globals["submit_answers"] = submit_answers
+    restricted_globals["_getiter_"] = iter  # Required for for loops and range()
+    restricted_globals["_iter_unpack_sequence_"] = guarded_iter_unpack_sequence  # Required for unpacking
+    restricted_globals["_inplacevar_"] = _inplacevar_  # Required for in-place operations (+=, -=, etc.)
+    
+    # Allow built-in list operations
+    restricted_globals["list"] = list
+    
+    # Allow safe modules
+    restricted_globals["math"] = math  # Math module for mathematical operations
+    restricted_globals["random"] = random  # Random module for random number generation
+    
     restricted_locals = {}
 
     try:
