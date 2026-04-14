@@ -18,7 +18,7 @@
 
   "unit3": {
     "title": "Conditionals",
-    "description": "Complete the following tasks:\n\nPart A: Write a conditional that checks if a number x is negative, positive, or zero, and returns the corresponding string.\n\nPart B: Create an expression that returns True if x is divisible by both 3 and 7, otherwise False.\n\nPart C: Write a conditional that assigns 'Weekend' if day is 'Saturday' or 'Sunday', otherwise 'Weekday'.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "description": "Complete the following tasks:\n\nPart A: Write a conditional that checks if a number x is negative, positive, or zero, and returns the corresponding string.\n\nPart B: Create an expression that returns True if x is divisible by both 3 and 7, otherwise False.\n\nPart C: Write a conditional that assigns 'Weekend' if day is 'Saturday' or 'Sunday', otherwise 'Weekday'.\n\nYour submission code should be submit_answers(part_a(10), part_b(21), part_c(2))",
     "answers": ["Positive", true, "Weekday"],
     "test_inputs": [[5], [21], ["Tuesday"]],
     "points": 100,
@@ -27,8 +27,8 @@
 
   "unit4": {
     "title": "Loops",
-    "description": "Complete the following tasks:\n\nPart A: Use a for loop to compute the sum of all even numbers between 1 and 100 (inclusive).\n\nPart B: Use a while loop to count how many times you can subtract 5 from 100 before the number becomes negative.\n\nPart C: Use a nested loop to count how many pairs (i, j) exist where both i and j range from 1 to 10 and i * j is even.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
-    "answers": [2550, 21, 50],
+    "description": "Complete the following tasks:\n\nPart A: Use a for loop to compute the sum of all even numbers between 1 and 100 (inclusive).\n\nPart B: Use a while loop to count how many times you can subtract 5 from 100 before the number becomes negative.\n\nPart C: Use a nested loop to count how many pairs (i, j) exist where both i and j range from 1 to 10 and i * j is even.\n\nYour submission code should be submit_answers(part_a(), part_b(), part_c())",
+    "answers": [2550, 21, 75],
     "points": 100,
     "num_parts": 3
   },
@@ -36,7 +36,7 @@
   "unit5": {
     "title": "Lists",
     "description": "Complete the following tasks:\n\nPart A: Create a list of the numbers 1–10 and return the sum of all elements at even indices.\n\nPart B: Return the length of a list after removing all elements greater than 5 from [2, 8, 3, 9, 1, 7, 4].\n\nPart C: Reverse the list [1, 2, 3, 4, 5] without using .reverse() or slicing.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
-    "answers": [30, 4, [5, 4, 3, 2, 1]],
+    "answers": [25, 4, [5, 4, 3, 2, 1]],
     "points": 100,
     "num_parts": 3
   },

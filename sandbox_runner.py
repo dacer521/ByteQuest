@@ -34,6 +34,18 @@ def _inplacevar_(op, x, y):
     return ops.get(op, operator.iadd)(x, y)
 
 
+# Helper function for subscript assignment (list[i] = value)
+def _write_(obj):
+    """Guard function that allows writing to objects like lists and dicts"""
+    return obj
+
+
+# Helper function for subscript reading (list[i])
+def _getitem_(obj, index):
+    """Guard function that allows reading from objects like lists and dicts"""
+    return obj[index]
+
+
 def apply_limits():
     # Limit CPU time and address space to reduce DoS risk.
     try:
@@ -78,6 +90,8 @@ def evaluate(unit_name, code, answer_keys):
     restricted_globals["_getiter_"] = iter  # Required for for loops and range()
     restricted_globals["_iter_unpack_sequence_"] = guarded_iter_unpack_sequence  # Required for unpacking
     restricted_globals["_inplacevar_"] = _inplacevar_  # Required for in-place operations (+=, -=, etc.)
+    restricted_globals["_write_"] = _write_  # Required for subscript assignment (list[i] = value)
+    restricted_globals["_getitem_"] = _getitem_  # Required for subscript reading (list[i])
     
     # Allow built-in list operations
     restricted_globals["list"] = list
