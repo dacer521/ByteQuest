@@ -9,7 +9,7 @@
 
   "unit2": {
     "title": "Data types and operators",
-    "description": "Complete the following tasks:\n\nPart A: Write an expression that takes a number (x) and returns True if x is even, and False if it is odd.\n\nPart B: Write an expression that returns True if a number (x) is greater than 11 and also odd.\n\nPart C: Write an expression that multiplies two numbers (x and y) and then floor divides the result by a third number (z).\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "description": "Complete the following tasks:\n\nPart A: Write an expression that takes a number (x) and returns True if x is even, and False if it is odd.\n\nPart B: Write an expression that returns True if a number (x) is greater than 11 and also odd.\n\nPart C: Write an expression that multiplies two numbers (x and y) and then floor divides the result by a third number (z).\n\nYour submission code should be submit_answers(part_a(12), part_b(13), part_c(18, 2, 2))",
     "answers": [true, true, 18],
     "test_inputs": [[4, 7, 3], [13, 14, 5], [6, 9, 2]],
     "points": 100,
