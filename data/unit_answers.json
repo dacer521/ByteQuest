@@ -43,7 +43,7 @@
 
   "unit6": {
     "title": "Functions",
-    "description": "Complete the following tasks:\n\nPart A: Define a function square(n) that returns n ** 2, then call it with 7.\n\nPart B: Define a function compare(a, b) that returns 'Equal', 'Greater', or 'Smaller' depending on the relation between a and b.\n\nPart C: Write a higher-order function that takes another function f and a number x, and returns f(x) + 1; test it using your square function and x = 3.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "description": "Complete the following tasks:\n\nPart A: Define a function square(n) that returns n ** 2, then call it with 7.\n\nPart B: Define a function compare(a, b) that returns 'Equal', 'Greater', or 'Smaller' depending on the relation between a and b. Call it with a = 10 and b = 3\n\nPart C: Write a higher-order function that takes another function f and a number x, and returns f(x) + 1; test it using your square function and x = 3.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
     "answers": [49, "Greater", 10],
     "points": 100,
     "num_parts": 3
@@ -51,7 +51,7 @@
 
   "unit7": {
     "title": "Outside Packages",
-    "description": "Complete the following tasks:\n\nPart A: Use the math module to calculate the factorial of 6.\n\nPart B: Enter the function call to get a random integer from 50-100. (do this in the format random.function(input1, input2)\n\nPart C: Use the turtle module to draw a square of side length 50, then return the number of sides drawn.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
+    "description": "Complete the following tasks:\n\nPart A: Use the math module to calculate the factorial of 6.\n\nPart B: Enter the function call to get a random integer from 50-100 in string form. (do this in the format random.function(input1, input2)\n\nPart C: Use the turtle module to draw a square of side length 50, then return the number of sides drawn.\n\nYour submit_answers() function should return [part_a_result, part_b_result, part_c_result].",
     "answers": [720, "random.randint(50, 100)" , 4],
     "points": 100,
     "num_parts": 3

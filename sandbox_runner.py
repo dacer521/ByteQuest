@@ -3,10 +3,12 @@ import os
 import resource
 import sys
 from RestrictedPython import compile_restricted, safe_globals
-from RestrictedPython.Guards import guarded_iter_unpack_sequence
+from RestrictedPython.Guards import guarded_iter_unpack_sequence, safe_builtins
 import operator
 import math
 import random
+import turtle
+import types
 
 BASE_DIR = os.path.dirname(__file__)
 ANSWER_PATH = os.path.join(BASE_DIR, "data", "unit_answers.json")
@@ -66,6 +68,26 @@ def load_payload():
         return json.loads(raw)
     except json.JSONDecodeError:
         return None
+def _safe_import(name, *args, **kwargs):
+    """Safely import only whitelisted modules"""
+    allowed_modules = {"math", "random", "turtle"}
+    if name not in allowed_modules:
+        raise ImportError(f"Import of {name} is not allowed")
+    
+    # Get the module from sys.modules or import it
+    import sys as sys_module
+    if name in sys_module.modules:
+        return sys_module.modules[name]
+    
+    # Import the module
+    if name == "math":
+        return math
+    elif name == "random":
+        return random
+    elif name == "turtle":
+        return turtle
+    else:
+        raise ImportError(f"Import of {name} is not allowed")
 
 
 def evaluate(unit_name, code, answer_keys):
@@ -86,6 +108,17 @@ def evaluate(unit_name, code, answer_keys):
 
     # Set up restricted globals with necessary guard functions for loops and iteration
     restricted_globals = safe_globals.copy()
+    
+    # Create a safe builtins dictionary with __import__ support
+    safe_builtins_dict = safe_globals.get('__builtins__', {})
+    if isinstance(safe_builtins_dict, dict):
+        safe_builtins_dict = safe_builtins_dict.copy()
+    else:
+        safe_builtins_dict = {}
+    
+    safe_builtins_dict['__import__'] = _safe_import
+    restricted_globals['__builtins__'] = safe_builtins_dict
+    
     restricted_globals["submit_answers"] = submit_answers
     restricted_globals["_getiter_"] = iter  # Required for for loops and range()
     restricted_globals["_iter_unpack_sequence_"] = guarded_iter_unpack_sequence  # Required for unpacking
@@ -96,9 +129,10 @@ def evaluate(unit_name, code, answer_keys):
     # Allow built-in list operations
     restricted_globals["list"] = list
     
-    # Allow safe modules
+    # Allow safe modules directly
     restricted_globals["math"] = math  # Math module for mathematical operations
     restricted_globals["random"] = random  # Random module for random number generation
+    restricted_globals["turtle"] = turtle  # Turtle module for drawing
     
     restricted_locals = {}
 
