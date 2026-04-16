@@ -7,7 +7,6 @@ from RestrictedPython.Guards import guarded_iter_unpack_sequence, safe_builtins
 import operator
 import math
 import random
-import turtle
 import types
 
 BASE_DIR = os.path.dirname(__file__)
@@ -132,7 +131,6 @@ def evaluate(unit_name, code, answer_keys):
     # Allow safe modules directly
     restricted_globals["math"] = math  # Math module for mathematical operations
     restricted_globals["random"] = random  # Random module for random number generation
-    restricted_globals["turtle"] = turtle  # Turtle module for drawing
     
     restricted_locals = {}
 
